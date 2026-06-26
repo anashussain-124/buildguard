@@ -10,9 +10,10 @@ WORKDIR /app
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend source
-COPY backend/ .
+# Copy backend source as a package so relative imports resolve
+COPY backend/ ./backend/
 
 EXPOSE $PORT
 
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Run as package — "from .utils import ..." works because backend/ has __init__.py
+CMD uvicorn backend.main:app --host 0.0.0.0 --port $PORT
