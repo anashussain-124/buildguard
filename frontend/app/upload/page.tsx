@@ -24,9 +24,9 @@ const getFileValidationError = (file: File) => {
 };
 
 const steps = [
-  { label: "Upload", icon: "1" },
-  { label: "Extract", icon: "2" },
-  { label: "Analyze", icon: "3" },
+  { label: "Upload", desc: "Select your file" },
+  { label: "Extract", desc: "Reading clauses" },
+  { label: "Analyze", desc: "Generating report" },
 ];
 
 export default function UploadPage() {
@@ -44,7 +44,6 @@ export default function UploadPage() {
       setError(validationError);
       return;
     }
-
     setSelectedFile(file);
     setError("");
     setActiveStep(1);
@@ -52,22 +51,18 @@ export default function UploadPage() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (!selectedFile) {
       setError("Please choose a PDF or DOCX file to upload.");
       return;
     }
-
     const validationError = getFileValidationError(selectedFile);
     if (validationError) {
       setError(validationError);
       return;
     }
-
     setError("");
     setStatusMessage("");
     setLoading(true);
-
     try {
       setStatusMessage("Uploading contract...");
       setActiveStep(2);
@@ -91,90 +86,132 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen bg-slate-950">
       <Navbar />
-      <main className="mx-auto max-w-3xl px-6 py-16">
-        <div className="rounded-lg bg-slate-900 p-10 shadow-lg shadow-slate-950/50">
-          <h1 className="text-3xl font-semibold text-slate-50">Upload contract</h1>
-          <p className="mt-3 text-slate-400">
-            Upload a PDF or DOCX contract and get a structured risk review with next-step guidance.
+      <main className="mx-auto max-w-2xl px-6 py-12">
+
+        <div className="rounded-xl border border-slate-800 bg-surface p-8 shadow-lg shadow-slate-950/40">
+          {/* Heading */}
+          <h1 className="text-2xl font-bold text-slate-50">Upload contract</h1>
+          <p className="mt-1.5 text-sm text-slate-400">
+            Upload a PDF or DOCX. We'll extract language and generate a structured risk report.
           </p>
 
-          {/* 3-Step Stepper */}
-          <div className="mt-8 flex items-center justify-between">
-            {steps.map((step, index) => (
-              <div key={step.label} className="flex flex-1 items-center">
-                <div className="flex flex-col items-center">
+          {/* ===== STEPPER ===== */}
+          <div className="mt-8 flex items-start justify-between">
+            {steps.map((step, i) => (
+              <div key={step.label} className="flex flex-1 flex-col items-center">
+                <div className="relative flex items-center justify-center">
+                  {/* Circle */}
                   <div
-                    className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold transition ${
-                      activeStep > index
-                        ? "bg-emerald-500 text-white"
-                        : activeStep === index && loading
-                        ? "bg-indigo-600 text-white animate-pulse"
-                        : "bg-slate-800 text-slate-400"
+                    className={`flex h-11 w-11 items-center justify-center rounded-full text-sm font-bold transition-all duration-300 ${
+                      activeStep > i + 1
+                        ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/25"
+                        : activeStep === i + 1
+                        ? "bg-brand-600 text-white shadow-lg shadow-brand-600/25 animate-pulse-ring"
+                        : "bg-elevated text-slate-500"
                     }`}
                   >
-                    {activeStep > index ? (
+                    {activeStep > i + 1 ? (
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      step.icon
+                      i + 1
                     )}
                   </div>
-                  <span
-                    className={`mt-2 text-xs font-semibold ${
-                      activeStep >= index ? "text-slate-50" : "text-slate-500"
-                    }`}
-                  >
-                    {step.label}
-                  </span>
+                  {/* Connector line */}
+                  {i < steps.length - 1 && (
+                    <div
+                      className={`absolute left-[calc(50%+28px)] top-1/2 h-0.5 w-[calc(100%-56px)] rounded ${
+                        activeStep > i + 1 ? "bg-emerald-500" : "bg-slate-700"
+                      }`}
+                    />
+                  )}
                 </div>
-                {index < steps.length - 1 && (
-                  <div
-                    className={`mx-2 h-0.5 flex-1 rounded ${
-                      activeStep > index ? "bg-emerald-500" : "bg-slate-700"
-                    }`}
-                  />
-                )}
+                <p
+                  className={`mt-2.5 text-xs font-semibold ${
+                    activeStep >= i + 1 ? "text-slate-100" : "text-slate-500"
+                  }`}
+                >
+                  {step.label}
+                </p>
+                <p className="text-[11px] text-slate-600">{step.desc}</p>
               </div>
             ))}
           </div>
 
+          {/* ===== UPLOAD FORM ===== */}
           <form className="mt-10 space-y-6" onSubmit={handleSubmit}>
             <div>
-              <p className="mb-3 text-sm font-semibold text-slate-300">Contract file</p>
+              <p className="mb-2 text-sm font-semibold text-slate-300">Contract file</p>
               <FileUploadZone
                 acceptedTypes={ACCEPTED_TYPES.join(",")}
                 onFileSelected={handleFileSelected}
               />
+              <p className="mt-2 text-xs text-slate-500">PDF or DOCX, up to 10 MB</p>
             </div>
 
+            {/* Selected file card */}
             {selectedFile && (
-              <div className="flex items-center gap-3 rounded-lg border border-indigo-700 bg-indigo-950/50 p-4 text-sm text-indigo-300">
-                <svg className="h-5 w-5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <span className="font-semibold">{selectedFile.name}</span>
-                <span className="text-indigo-400">
-                  ({(selectedFile.size / (1024 * 1024)).toFixed(2)} MB)
-                </span>
+              <div className="flex items-center gap-3 rounded-lg border border-brand-800 bg-brand-950/40 p-4 transition animate-fade-in">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-brand-600/20">
+                  <svg className="h-5 w-5 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-brand-200">{selectedFile.name}</p>
+                  <p className="text-xs text-brand-400">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
+                </div>
+                {!loading && (
+                  <button
+                    type="button"
+                    onClick={() => { setSelectedFile(null); setActiveStep(0); setError(""); }}
+                    className="shrink-0 rounded-lg p-1.5 text-slate-500 hover:bg-elevated hover:text-slate-300 transition"
+                    aria-label="Remove file"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
               </div>
             )}
 
-            {error && <p className="rounded-lg bg-rose-950 p-3 text-sm text-rose-400">{error}</p>}
-            {statusMessage && <p className="text-sm text-indigo-400">{statusMessage}</p>}
+            {/* Error */}
+            {error && (
+              <div className="rounded-lg border border-rose-800 bg-rose-950/50 p-3 text-sm text-rose-400 animate-fade-in">
+                {error}
+              </div>
+            )}
 
+            {/* Status message */}
+            {statusMessage && (
+              <div className="flex items-center gap-2 rounded-lg border border-brand-800 bg-brand-950/40 p-3 text-sm text-brand-300 animate-fade-in">
+                <LoadingSpinner sizeClassName="h-4 w-4" />
+                {statusMessage}
+              </div>
+            )}
+
+            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-3 rounded-lg bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-brand-600/20"
             >
               {loading ? (
                 <>
-                  <LoadingSpinner sizeClassName="h-5 w-5" />
+                  <LoadingSpinner sizeClassName="h-4 w-4" />
                   <span>Processing...</span>
                 </>
               ) : (
-                "Upload and analyze"
+                <>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                  </svg>
+                  Upload and analyze
+                </>
               )}
             </button>
           </form>

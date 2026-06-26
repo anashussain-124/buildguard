@@ -17,7 +17,6 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await login({ email, password });
       router.push("/dashboard");
@@ -32,52 +31,82 @@ export default function LoginPage() {
     <div className="min-h-screen bg-slate-950">
       <Navbar />
       <main className="mx-auto max-w-md px-6 py-16">
-        <div className="mt-20 rounded-lg bg-slate-800 p-10 shadow-xl shadow-slate-950/50">
-          <h1 className="text-3xl font-semibold text-slate-50">Login</h1>
-          <p className="mt-3 text-slate-400">Access your contract risk dashboard with email and password.</p>
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-300">Email</span>
-              <input
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                autoComplete="email"
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-50 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-              />
-            </label>
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-300">Password</span>
-              <input
-                type="password"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                minLength={8}
-                autoComplete="current-password"
-                className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 text-slate-50 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-              />
-            </label>
-            {error && (
-              <div className="rounded-lg bg-rose-900/20 p-3">
-                <p className="text-sm text-rose-400">{error}</p>
+        <div className="mt-12">
+          {/* Brand */}
+          <div className="mb-8 text-center">
+            <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-brand-600 text-xl font-extrabold text-white">
+              B
+            </span>
+            <h1 className="mt-4 text-2xl font-bold text-slate-50">Welcome back</h1>
+            <p className="mt-1 text-sm text-slate-400">Sign in to your BuildGuard AI account.</p>
+          </div>
+
+          <div className="rounded-xl border border-slate-800 bg-surface p-8 shadow-lg">
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div>
+                <label className="block text-sm font-medium text-slate-300">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  className="mt-1.5 block w-full rounded-lg border border-slate-700 bg-elevated px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                />
               </div>
-            )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 disabled:opacity-70"
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </button>
-            <p className="text-center text-sm text-slate-400">
-              Don&apos;t have an account?{" "}
-              <Link href="/auth/register" className="font-semibold text-indigo-400 hover:text-indigo-300">
-                Register
-              </Link>
-            </p>
-          </form>
+
+              <div>
+                <div className="flex items-center justify-between">
+                  <label className="block text-sm font-medium text-slate-300">Password</label>
+                  <Link href="/auth/forgot-password" className="text-xs font-medium text-brand-400 hover:text-brand-300">
+                    Forgot password?
+                  </Link>
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="mt-1.5 block w-full rounded-lg border border-slate-700 bg-elevated px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+                />
+              </div>
+
+              {error && (
+                <div className="rounded-lg border border-rose-800 bg-rose-950/50 p-3">
+                  <p className="text-sm text-rose-400">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Signing in...
+                  </>
+                ) : (
+                  "Sign in"
+                )}
+              </button>
+
+              <p className="text-center text-sm text-slate-500">
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/register" className="font-semibold text-brand-400 hover:text-brand-300">
+                  Register
+                </Link>
+              </p>
+            </form>
+          </div>
         </div>
       </main>
     </div>

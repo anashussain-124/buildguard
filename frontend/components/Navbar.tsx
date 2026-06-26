@@ -1,38 +1,61 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
+
+const navLinks = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/upload", label: "Upload" },
+  { href: "/pricing", label: "Pricing" },
+];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-700 bg-slate-900/80 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="text-xl font-semibold text-indigo-400">
-          BuildGuard AI
+    <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-950/85 backdrop-blur-lg">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 font-extrabold text-sm text-white transition group-hover:bg-brand-700">
+            B
+          </span>
+          <span className="text-lg font-bold text-slate-50">
+            BuildGuard <span className="text-brand-400">AI</span>
+          </span>
         </Link>
+
         {/* Desktop nav */}
-        <nav className="hidden items-center gap-6 text-sm text-slate-400 md:flex">
-          <Link href="/dashboard" className="transition hover:text-slate-50">
-            Dashboard
-          </Link>
-          <Link href="/upload" className="transition hover:text-slate-50">
-            Upload
-          </Link>
-          <Link href="/pricing" className="transition hover:text-slate-50">
-            Pricing
-          </Link>
+        <nav className="hidden items-center gap-1 md:flex">
+          {navLinks.map((link) => {
+            const active = pathname === link.href || pathname.startsWith(link.href + "/");
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
+                  active
+                    ? "bg-elevated text-brand-400"
+                    : "text-slate-400 hover:bg-elevated hover:text-slate-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
           <Link
             href="/auth/login"
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-white transition hover:bg-indigo-700"
+            className="ml-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700"
           >
-            Login
+            Sign in
           </Link>
         </nav>
+
         {/* Mobile hamburger */}
         <button
-          className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-slate-50 md:hidden"
+          className="inline-flex items-center justify-center rounded-lg p-2 text-slate-400 hover:bg-elevated hover:text-slate-50 md:hidden"
           onClick={() => setMobileOpen(!mobileOpen)}
           aria-label="Toggle navigation menu"
         >
@@ -45,25 +68,32 @@ export default function Navbar() {
           </svg>
         </button>
       </div>
+
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="border-t border-slate-700 bg-slate-900 px-6 py-4 md:hidden">
-          <nav className="flex flex-col gap-4 text-sm text-slate-400">
-            <Link href="/dashboard" className="transition hover:text-slate-50" onClick={() => setMobileOpen(false)}>
-              Dashboard
-            </Link>
-            <Link href="/upload" className="transition hover:text-slate-50" onClick={() => setMobileOpen(false)}>
-              Upload
-            </Link>
-            <Link href="/pricing" className="transition hover:text-slate-50" onClick={() => setMobileOpen(false)}>
-              Pricing
-            </Link>
+        <div className="border-t border-slate-800 bg-slate-950 px-6 py-4 md:hidden animate-fade-in">
+          <nav className="flex flex-col gap-2">
+            {navLinks.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                    active ? "bg-elevated text-brand-400" : "text-slate-400 hover:bg-elevated hover:text-slate-100"
+                  }`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <Link
               href="/auth/login"
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-center text-white transition hover:bg-indigo-700"
+              className="mt-2 rounded-lg bg-brand-600 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
               onClick={() => setMobileOpen(false)}
             >
-              Login
+              Sign in
             </Link>
           </nav>
         </div>

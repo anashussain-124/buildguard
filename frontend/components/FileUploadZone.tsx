@@ -19,32 +19,32 @@ export default function FileUploadZone({ onFileSelected, acceptedTypes }: FileUp
   return (
     <label
       htmlFor={inputId}
-      className={`block cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition ${
+      className={`relative block cursor-pointer rounded-xl border-2 border-dashed p-10 text-center transition-all duration-200 ${
         dragActive
-          ? "border-indigo-500 bg-indigo-950/50"
-          : "border-slate-700 bg-slate-900 hover:border-indigo-600 hover:bg-slate-800"
+          ? "border-brand-400 bg-brand-600/10 scale-[1.01]"
+          : "border-slate-700 bg-elevated hover:border-brand-600/50 hover:bg-surface"
       }`}
-      onDragOver={(event) => {
-        event.preventDefault();
-        setDragActive(true);
-      }}
-      onDragLeave={(event) => {
-        event.preventDefault();
-        setDragActive(false);
-      }}
-      onDrop={(event) => {
-        event.preventDefault();
-        setDragActive(false);
-        handleFiles(event.dataTransfer.files);
-      }}
+      onDragOver={(e) => { e.preventDefault(); setDragActive(true); }}
+      onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
+      onDrop={(e) => { e.preventDefault(); setDragActive(false); handleFiles(e.dataTransfer.files); }}
     >
       <div className="flex flex-col items-center gap-3">
-        <svg className="h-10 w-10 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-        </svg>
-        <p className="text-lg font-semibold text-slate-200">Drag and drop a file here</p>
-        <p className="text-sm text-slate-400">PDF or DOCX only. Max 10MB.</p>
-        <span className="mt-2 inline-flex rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-indigo-700">
+        {/* Upload icon */}
+        <div className={`flex h-12 w-12 items-center justify-center rounded-xl transition-colors ${
+          dragActive ? "bg-brand-600/20 text-brand-400" : "bg-elevated text-slate-500"
+        }`}>
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        </div>
+        <p className={`text-base font-semibold ${dragActive ? "text-brand-300" : "text-slate-200"}`}>
+          {dragActive ? "Drop your file here" : "Drag and drop a file here"}
+        </p>
+        <p className="text-sm text-slate-500">PDF or DOCX only. Max 10MB.</p>
+        <span className="mt-1 inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 shadow-sm">
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+          </svg>
           Choose file
         </span>
       </div>
@@ -53,7 +53,7 @@ export default function FileUploadZone({ onFileSelected, acceptedTypes }: FileUp
         type="file"
         accept={acceptedTypes}
         className="sr-only"
-        onChange={(event) => handleFiles(event.target.files)}
+        onChange={(e) => handleFiles(e.target.files)}
       />
     </label>
   );
