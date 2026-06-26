@@ -37,6 +37,7 @@ load_dotenv()
 
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 JWT_SECRET = os.getenv("JWT_SECRET")
 # FIX: GAP-07 — JWT key rotation support
@@ -101,6 +102,8 @@ if not OPENROUTER_API_KEY:
     raise RuntimeError("OPENROUTER_API_KEY is required")
 if not SUPABASE_URL:
     raise RuntimeError("SUPABASE_URL is required")
+if not SUPABASE_ANON_KEY:
+    raise RuntimeError("SUPABASE_ANON_KEY is required")
 if not SUPABASE_SERVICE_KEY:
     raise RuntimeError("SUPABASE_SERVICE_KEY is required")
 if not JWT_SECRET:
@@ -456,8 +459,8 @@ def invalidate_user_cache(user_id: str) -> None:
 def create_user_in_supabase_auth(email: str, password: str) -> Dict[str, Any]:
     url = f"{SUPABASE_URL}/auth/v1/signup"
     headers = {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
         "Content-Type": "application/json",
     }
     body = {"email": email, "password": password}
@@ -471,8 +474,8 @@ def create_user_in_supabase_auth(email: str, password: str) -> Dict[str, Any]:
 def authenticate_supabase_user(email: str, password: str) -> Dict[str, Any]:
     url = f"{SUPABASE_URL}/auth/v1/token?grant_type=password"
     headers = {
-        "apikey": SUPABASE_SERVICE_KEY,
-        "Authorization": f"Bearer {SUPABASE_SERVICE_KEY}",
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": f"Bearer {SUPABASE_ANON_KEY}",
         "Content-Type": "application/json",
     }
     body = {"email": email, "password": password}
@@ -753,14 +756,23 @@ async def log_auth_events(request: Request, call_next):
                 level="info",
                 data={"user_hash": user_id_hash or "anonymous", "path": request.url.path},
             )
-    # FIX: GAP-07 — If old-key token was used, issue refreshed token in header
+    # FIX: GAP-07 — If old-key token was used, reissue as httpOnly cookie (not header)
     reissue_for = getattr(request.state, "reissue_token_for", None)
     if reissue_for:
         try:
             user = get_user_by_id(reissue_for)
             if user:
                 new_access_token = create_access_token(reissue_for, str(user.get("email", "")))
-                response.headers["X-Refreshed-Token"] = new_access_token
+                # Set as httpOnly cookie instead of exposing in response header
+                response.set_cookie(
+                    key=TOKEN_COOKIE_NAME,
+                    value=new_access_token,
+                    httponly=True,
+                    secure=IS_PRODUCTION,
+                    samesite="strict",
+                    max_age=ACCESS_TOKEN_EXPIRY_MINUTES * 60,
+                    path="/",
+                )
         except Exception:
             pass  # Don't fail the request for reissue errors
     return response

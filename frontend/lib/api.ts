@@ -83,12 +83,10 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
     }
   }
 
-  // FIX: GAP-07 — Intercept X-Refreshed-Token and update cookie silently
-  const refreshedToken = response.headers.get("X-Refreshed-Token");
-  if (refreshedToken) {
-    // Set the new token in the auth cookie (matching backend cookie settings)
-    document.cookie = `__Host-bgai_token=${refreshedToken}; Secure; SameSite=Strict; Path=/`;
-  }
+  // FIX: GAP-07 — Intercept X-Refreshed-Token
+  // The backend sets the refreshed token as an httpOnly cookie via Set-Cookie,
+  // so we do NOT write it via document.cookie (which would bypass httpOnly).
+  // Stale references cleaned up; no client-side cookie write needed.
 
   if (!response.ok) {
     if (response.status === 401) {

@@ -58,6 +58,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..",
 # ---------------------------------------------------------------------------
 os.environ.setdefault("OPENROUTER_API_KEY", "test-openrouter-key")
 os.environ.setdefault("SUPABASE_URL", "https://example.supabase.co")
+os.environ.setdefault("SUPABASE_ANON_KEY", "test-anon-key")
 os.environ.setdefault("SUPABASE_SERVICE_KEY", "test-service-key")
 os.environ.setdefault("JWT_SECRET", "test-jwt-secret-for-unit-tests")
 os.environ.setdefault("JWT_SECRET_PREVIOUS", "test-previous-jwt-secret")

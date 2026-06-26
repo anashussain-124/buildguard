@@ -2,12 +2,12 @@ import { test, expect } from "@playwright/test";
 import * as path from "path";
 
 const SAMPLE_PDF = path.join(__dirname, "./fixtures/sample_contract.pdf");
+const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "SecurePass123!";
 
 test.describe("Authentication flows", () => {
   test("user can register a new account", async ({ page }) => {
     const timestamp = Date.now();
     const email = `test_${timestamp}@example.com`;
-    const password = "SecurePass123!";
 
     await page.goto("/auth/register");
 
@@ -16,8 +16,8 @@ test.describe("Authentication flows", () => {
 
     // Fill registration form
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[autocomplete="new-password"]').first().fill(password);
-    await page.locator('input[autocomplete="new-password"]').nth(1).fill(password);
+    await page.locator('input[autocomplete="new-password"]').first().fill(TEST_PASSWORD);
+    await page.locator('input[autocomplete="new-password"]').nth(1).fill(TEST_PASSWORD);
 
     // Submit form
     await page.locator('button[type="submit"]').click();
@@ -30,13 +30,12 @@ test.describe("Authentication flows", () => {
   test("user can login and logout", async ({ page }) => {
     const timestamp = Date.now();
     const email = `test_${timestamp}@example.com`;
-    const password = "SecurePass123!";
 
     // First register a user
     await page.goto("/auth/register");
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[autocomplete="new-password"]').first().fill(password);
-    await page.locator('input[autocomplete="new-password"]').nth(1).fill(password);
+    await page.locator('input[autocomplete="new-password"]').first().fill(TEST_PASSWORD);
+    await page.locator('input[autocomplete="new-password"]').nth(1).fill(TEST_PASSWORD);
     await page.locator('button[type="submit"]').click();
     await page.waitForURL("/dashboard");
 
@@ -50,7 +49,7 @@ test.describe("Authentication flows", () => {
 
     // Login
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[type="password"]').fill(password);
+    await page.locator('input[type="password"]').fill(TEST_PASSWORD);
     await page.locator('button[type="submit"]').click();
 
     // Should redirect to dashboard
@@ -61,13 +60,12 @@ test.describe("Authentication flows", () => {
   test("login fails with wrong password", async ({ page }) => {
     const timestamp = Date.now();
     const email = `test_${timestamp}@example.com`;
-    const password = "SecurePass123!";
 
     // Register a user first
     await page.goto("/auth/register");
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[autocomplete="new-password"]').first().fill(password);
-    await page.locator('input[autocomplete="new-password"]').nth(1).fill(password);
+    await page.locator('input[autocomplete="new-password"]').first().fill(TEST_PASSWORD);
+    await page.locator('input[autocomplete="new-password"]').nth(1).fill(TEST_PASSWORD);
     await page.locator('button[type="submit"]').click();
     await page.waitForURL("/dashboard");
 

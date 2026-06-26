@@ -3,18 +3,18 @@ import * as path from "path";
 import * as fs from "fs";
 
 const SAMPLE_PDF = path.join(__dirname, "./fixtures/sample_contract.pdf");
+const TEST_PASSWORD = process.env.E2E_TEST_PASSWORD || "SecurePass123!";
 
 test.describe("File upload", () => {
   test("user can upload a PDF file", async ({ page }) => {
     const timestamp = Date.now();
     const email = `upload_${timestamp}@example.com`;
-    const password = "SecurePass123!";
 
     // Register and login
     await page.goto("/auth/register");
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[autocomplete="new-password"]').first().fill(password);
-    await page.locator('input[autocomplete="new-password"]').nth(1).fill(password);
+    await page.locator('input[autocomplete="new-password"]').first().fill(TEST_PASSWORD);
+    await page.locator('input[autocomplete="new-password"]').nth(1).fill(TEST_PASSWORD);
     await page.locator('button[type="submit"]').click();
     await page.waitForURL("/dashboard");
 
@@ -39,13 +39,12 @@ test.describe("File upload", () => {
   test("upload rejects non-PDF file", async ({ page }) => {
     const timestamp = Date.now();
     const email = `upload_reject_${timestamp}@example.com`;
-    const password = "SecurePass123!";
 
     // Register and login
     await page.goto("/auth/register");
     await page.locator('input[type="email"]').fill(email);
-    await page.locator('input[autocomplete="new-password"]').first().fill(password);
-    await page.locator('input[autocomplete="new-password"]').nth(1).fill(password);
+    await page.locator('input[autocomplete="new-password"]').first().fill(TEST_PASSWORD);
+    await page.locator('input[autocomplete="new-password"]').nth(1).fill(TEST_PASSWORD);
     await page.locator('button[type="submit"]').click();
     await page.waitForURL("/dashboard");
 
