@@ -11,6 +11,6 @@ python-docx==1.1.2
 pydantic==2.7.1
 pytest==7.4.0
 sentry-sdk[fastapi]>=2.0.0       # GAP-02
-upstash-redis>=1.0.0             # GAP-01
+upstash-redis>=1.7.0             # GAP-01
 pymupdf>=1.24.0                  # GAP-04
 langdetect>=1.0.9                # GAP-05
