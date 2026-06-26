@@ -149,9 +149,46 @@ npm run dev
 - `DELETE /contracts/{contract_id}`
 
 ## Deployment
-The project is configured for Vercel with `vercel.json`:
-- `/api/*` routes are served by `backend/main.py`
-- All other routes are served from `frontend`
+
+### Architecture
+
+- **Frontend**: Next.js on Vercel → https://frontend-mu-drab-54.vercel.app
+- **Backend**: FastAPI on Railway → https://backend-production-cfa2b.up.railway.app
+- The frontend proxies `/api/*` requests to the backend via Next.js rewrites (see `frontend/next.config.mjs`)
+
+### Quick Deploy Steps
+
+1. Deploy backend to Railway from the `backend/` directory (Dockerfile is auto-detected via `railway.json`)
+2. Set all required env vars on Railway (see `.env.example` or run `bash scripts/set_railway_env.sh`)
+3. Set `NEXT_PUBLIC_API_URL` on Vercel to the Railway backend URL (or run `bash scripts/set_vercel_env.sh`)
+4. Deploy frontend to Vercel from the repo root
+5. Verify: `bash scripts/post_deploy_check.sh`
+
+## Domain Setup
+
+### Option A — Vercel custom domain (recommended)
+1. Vercel dashboard → your project → Settings → Domains
+2. Add your .in domain (e.g. buildguard.in)
+3. Add the CNAME record your DNS provider shows (e.g. cname.vercel-dns.com)
+4. Wait for SSL (usually < 2 min)
+5. Update Railway env var:
+     ALLOWED_ORIGINS=https://buildguard.in,https://www.buildguard.in
+6. Redeploy Railway service for the CORS change to take effect
+
+### Option B — Railway custom domain (if backend also needs a subdomain)
+1. Railway dashboard → backend service → Settings → Domains → Add domain
+2. Add api.buildguard.in
+3. Add the CNAME record Railway shows
+4. Update Vercel env var:
+     NEXT_PUBLIC_API_URL=https://api.buildguard.in
+5. Redeploy Vercel: vercel --prod
+
+### DNS records summary (fill in your domain)
+| Type  | Name | Value                        | Purpose           |
+|-------|------|------------------------------|-------------------|
+| CNAME | @    | cname.vercel-dns.com         | Frontend (Vercel) |
+| CNAME | www  | cname.vercel-dns.com         | www redirect      |
+| CNAME | api  | [Railway CNAME value]        | Backend API       |
 
 ## Notes
 - Use a Supabase service role key for `SUPABASE_SERVICE_KEY`.
