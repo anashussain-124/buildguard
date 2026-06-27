@@ -44,13 +44,19 @@ JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_SECRET_PREVIOUS = os.getenv("JWT_SECRET_PREVIOUS", "")
 JWT_ALGORITHM = "HS256"
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000").split(",")
-TOKEN_COOKIE_NAME = "__Host-bgai_token"
-CSRF_COOKIE_NAME = "__Host-csrf"
+IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
+if IS_PRODUCTION:
+    TOKEN_COOKIE_NAME = "__Host-bgai_token"
+    CSRF_COOKIE_NAME = "__Host-csrf"
+    REFRESH_COOKIE_NAME = "__Host-bgai_refresh"
+else:
+    TOKEN_COOKIE_NAME = "bgai_token"
+    CSRF_COOKIE_NAME = "bgai_csrf"
+    REFRESH_COOKIE_NAME = "bgai_refresh"
 ACCESS_TOKEN_EXPIRY_MINUTES = 15
 REFRESH_TOKEN_EXPIRY_DAYS = 7
 RATE_LIMIT_WINDOW_SECONDS = 60
 RATE_LIMIT_MAX_REQUESTS = 10
-IS_PRODUCTION = os.getenv("ENVIRONMENT") == "production"
 
 # FIX: GAP-02 — Sentry init (no-op when SENTRY_DSN is unset)
 _sentry_dsn = os.getenv("SENTRY_DSN")
@@ -1184,7 +1190,7 @@ def _set_auth_cookies(response: Response, access_token: str, refresh_token: str)
         path="/",
     )
     response.set_cookie(
-        key="__Host-bgai_refresh",
+        key=REFRESH_COOKIE_NAME,
         value=refresh_token,
         httponly=True,
         secure=IS_PRODUCTION,
