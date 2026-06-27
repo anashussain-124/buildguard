@@ -472,7 +472,12 @@ def create_user_in_supabase_auth(email: str, password: str) -> Dict[str, Any]:
     body = {"email": email, "password": password}
     response = httpx.post(url, headers=headers, json=body, timeout=30)
     if response.status_code not in (200, 201):
-        detail = response.json().get("error_description") or response.json().get("error") or "Registration failed"
+        err = response.json()
+        detail = (
+            err.get("error_description")
+            or err.get("error")
+            or err.get("msg", "Registration failed")
+        )
         raise HTTPException(status_code=400, detail=detail)
     return response.json()
 
@@ -487,7 +492,12 @@ def authenticate_supabase_user(email: str, password: str) -> Dict[str, Any]:
     body = {"email": email, "password": password}
     response = httpx.post(url, headers=headers, json=body, timeout=30)
     if response.status_code != 200:
-        detail = response.json().get("error_description") or response.json().get("error") or "Login failed"
+        err = response.json()
+        detail = (
+            err.get("error_description")
+            or err.get("error")
+            or err.get("msg", "Login failed")
+        )
         raise HTTPException(status_code=401, detail=detail)
     return response.json()
 
